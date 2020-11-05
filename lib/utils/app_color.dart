@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 final Color kBlueText = HexColor("#535BFE");
 final Color kGry = HexColor("#404852");
 final Color kLightGry = HexColor("#7A7A7A");
+final Color kGryBG = HexColor("#dee3e7");
+final Color kButtonBG = HexColor("#535bfe");
 
 
 /*final Color kColorPrimary = HexColor("#D82B2B");
