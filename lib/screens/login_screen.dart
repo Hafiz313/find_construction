@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                            if(_loginModel.status){
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
-                              Navigator.pushReplacementNamed(context, HomeScreen.id);
+                              Navigator.pushNamed(context, LoadingScreen.id);
                            }
                            else
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));

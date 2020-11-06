@@ -58,14 +58,7 @@ class HomeDrawer extends StatelessWidget {
               Navigator.pushNamed(context, FavoriteScreen.id);
             },
           ),
-          ListTile(
-            title: Text('Setting', style: TextStyle(fontSize: 15),),
-            leading: Icon(FontAwesomeIcons.cog,
-              color: kBlueText,
 
-            ),
-            onTap: () {},
-          ),
           ListTile(
             title: Text('About us', style: TextStyle(fontSize: 15),),
             leading: Icon(FontAwesomeIcons.exclamationCircle,

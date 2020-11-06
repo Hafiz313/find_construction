@@ -4,6 +4,7 @@ import 'package:find_construction/weight/home_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   static const id = "home_screen";
@@ -12,8 +13,29 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
+
+  double doubleLat,doubleLng;
+
+
+
+  Future<void> getLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+     String strLat = prefs.getString('location_lan');
+    String strLng = prefs.getString('location_lng');
+     doubleLat = double.parse(strLat);
+     doubleLng = double.parse(strLng);
+    print ("share parafrece lat $doubleLat and $doubleLng");
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLocation();
+  }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           child: GoogleMap(
                             initialCameraPosition: CameraPosition(
-                                target: LatLng(31.512736, 74.342480), zoom: 17),
+                                target: LatLng(34.434,23.455), zoom: 16),
                           ),
                         ),
                       )
