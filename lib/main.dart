@@ -6,6 +6,7 @@ import 'package:find_construction/screens/home_Screen.dart';
 import 'package:find_construction/screens/loading_screen.dart';
 import 'package:find_construction/screens/login_screen.dart';
 import 'package:find_construction/screens/password_verification_screen.dart';
+import 'package:find_construction/screens/profile_screen.dart';
 import 'package:find_construction/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         PasswordVerificationScreen.id:(context) => PasswordVerificationScreen(),
         ConfermedPasswordScreen.id:(context) => ConfermedPasswordScreen(),
         LoadingScreen.id :(context) => LoadingScreen(),
+        ProfileScreen.id :(context) => ProfileScreen(),
       },
     );
   }

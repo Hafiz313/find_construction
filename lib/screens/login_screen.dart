@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:find_construction/models/login_models.dart';
 import 'package:find_construction/screens/forget_screen.dart';
 import 'package:find_construction/screens/home_Screen.dart';
 import 'package:find_construction/screens/registration_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert' as JSON;
 
 import 'loading_screen.dart';
 
@@ -45,8 +49,15 @@ class _LoginScreenState extends State<LoginScreen> {
   LoginModel _loginModel;
   String strEmail, strPassword;
   GoogleSignIn _googleSignIn=GoogleSignIn(scopes:['email']);
+  //final facebookLogin = FacebookLogin();
 
- /* static final FacebookLogin facebookSignIn = new FacebookLogin();
+  @override
+  void initState() {
+   // facebookLogin.loginBehavior=FacebookLoginBehavior.webViewOnly;
+    super.initState();
+  }
+
+  /* static final FacebookLogin facebookSignIn = new FacebookLogin();
   String _message = 'Log in/out by pressing the buttons below.';
 
   Future<Null> _login() async {
@@ -84,6 +95,13 @@ class _LoginScreenState extends State<LoginScreen> {
       _message = message;
     });
   }*/
+  saveValue(String responseData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    Map json = jsonDecode(responseData);
+    String user = jsonEncode(LoginModel.fromJson(json));
+    prefs.setString('login_response', user);
+  }
 
 
 
@@ -123,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (String value) {
                         if (value.isEmpty)
                           return "Empty !";
-                        else if (emailValidation(value)){
+                        else if (emailValidation(value.trim())){
                           strEmail= value.toString().trim();
                         }
                         else
@@ -169,16 +187,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () async {
 
                           if (_formKey.currentState.validate()) {
-
                            LoginModel login = await createLogin(strEmail, strPassword);
+
                            setState(() {
                               _loginModel=login;
                            });
                            print("email: $strEmail and Password $strPassword");
+                           
+
 
                            if(_loginModel.status){
+                             print("---------login ${_loginModel.response[0]}----------");
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
-                              Navigator.pushNamed(context, LoadingScreen.id);
+                              Navigator.pushReplacementNamed(context, LoadingScreen.id);
                            }
                            else
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
@@ -220,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, RegistrationScreen.id);
+                            Navigator.pushReplacementNamed(context, RegistrationScreen.id);
                           },
                           child: Text(
                             "Sign Up",
@@ -268,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: InkWell(
                               onTap: () async{
                                 try{
-                                //  _login();
+                                         //    _fbLogin();
                                   print("facebook login");
                                 }
                                 catch(e){
@@ -289,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: InkWell(
                               onTap: () async{
                                 try{
-//                                  _googleSignIn.signOut();
+                                  _googleSignIn.signOut();
                                   await _googleSignIn.signIn().then((value) {
                                     final String name=_googleSignIn.currentUser.displayName;
                                     final String email=_googleSignIn.currentUser.email;
@@ -332,5 +353,42 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  /*_fbLogin() async{
+    final result = await facebookLogin.logInWithReadPermissions(['email']);
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+
+        final fbToken = result.accessToken.token;
+        final graphResponse = await http.get(
+            'https://graph.facebook.com/v2.12/me?fields=name,picture.width(800).height(800),email&access_token=$fbToken');
+
+        final profile = JSON.jsonDecode(graphResponse.body);
+        print(profile.toString());
+
+
+        final String name=profile['name'];
+        final String gid=profile['id'];
+        final String pic=profile["picture"]["data"]["url"];
+        final String email=profile["email"];
+
+
+
+        final String password="";
+
+
+
+
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        Fluttertoast.showToast(msg:"Facebook login cancelled by User");
+
+        break;
+      case FacebookLoginStatus.error:
+        Fluttertoast.showToast(msg:result.errorMessage);
+        break;
+    }
+
+  }*/
   }
 

@@ -1,4 +1,5 @@
 import 'package:find_construction/screens/favorite_screen.dart';
+import 'package:find_construction/screens/profile_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -45,7 +46,10 @@ class HomeDrawer extends StatelessWidget {
               color: kBlueText,
 
             ),
-            onTap: () {},
+            onTap: () {
+
+              Navigator.pushNamed(context, ProfileScreen.id);
+            },
           ),
           ListTile(
             title: Text('Favorite', style: TextStyle(fontSize: 15),),

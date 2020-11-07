@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+
+
 HouseHomeModel houseHomeModelFromJson(String str) => HouseHomeModel.fromJson(json.decode(str));
 
 String houseHomeModelToJson(HouseHomeModel data) => json.encode(data.toJson());
