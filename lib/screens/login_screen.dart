@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:find_construction/models/login_models.dart';
 import 'package:find_construction/screens/forget_screen.dart';
 import 'package:find_construction/screens/home_Screen.dart';
+import 'package:find_construction/screens/profile_screen.dart';
 import 'package:find_construction/screens/registration_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
@@ -95,12 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _message = message;
     });
   }*/
-  saveValue(String responseData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    Map json = jsonDecode(responseData);
-    String user = jsonEncode(LoginModel.fromJson(json));
-    prefs.setString('login_response', user);
+  save(value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("login_response", json.encode(value));
   }
 
 
@@ -193,13 +191,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               _loginModel=login;
                            });
                            print("email: $strEmail and Password $strPassword");
-                           
-
-
                            if(_loginModel.status){
+                             save(_loginModel);
                              print("---------login ${_loginModel.response[0]}----------");
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
-                              Navigator.pushReplacementNamed(context, LoadingScreen.id);
+                              Navigator.pushNamed(context, LoadingScreen.id);
                            }
                            else
                              Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));

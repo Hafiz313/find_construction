@@ -4,8 +4,6 @@
 
 import 'dart:convert';
 
-
-
 HouseHomeModel houseHomeModelFromJson(String str) => HouseHomeModel.fromJson(json.decode(str));
 
 String houseHomeModelToJson(HouseHomeModel data) => json.encode(data.toJson());
@@ -38,46 +36,58 @@ class Response {
   Response({
     this.name,
     this.icon,
+    this.mainIcon,
     this.bedroom,
     this.washroom,
     this.kitchen,
     this.location,
     this.shortDetail,
-    this.description,
+    this.area,
+    this.latitude,
+    this.longtitude,
     this.video,
   });
 
   String name;
   String icon;
+  String mainIcon;
   String bedroom;
   String washroom;
   String kitchen;
   String location;
   String shortDetail;
-  String description;
+  String area;
+  String latitude;
+  String longtitude;
   String video;
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
     name: json["name"],
     icon: json["icon"],
+    mainIcon: json["main_icon"],
     bedroom: json["bedroom"],
     washroom: json["washroom"],
     kitchen: json["kitchen"],
     location: json["location"],
     shortDetail: json["short_detail"],
-    description: json["description"],
+    area: json["area"],
+    latitude: json["latitude"],
+    longtitude: json["longtitude"],
     video: json["video"],
   );
 
   Map<String, dynamic> toJson() => {
     "name": name,
     "icon": icon,
+    "main_icon": mainIcon,
     "bedroom": bedroom,
     "washroom": washroom,
     "kitchen": kitchen,
     "location": location,
     "short_detail": shortDetail,
-    "description": description,
+    "area": area,
+    "latitude": latitude,
+    "longtitude": longtitude,
     "video": video,
   };
 }

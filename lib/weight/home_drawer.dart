@@ -1,4 +1,5 @@
 import 'package:find_construction/screens/favorite_screen.dart';
+import 'package:find_construction/screens/login_screen.dart';
 import 'package:find_construction/screens/profile_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,10 @@ class HomeDrawer extends StatelessWidget {
               color: kBlueText,
 
             ),
-            onTap: () {},
+            onTap: () {
+
+              Navigator.pushNamed(context, LoginScreen.id);
+            },
           ),
           ListTile(
             title: Text('Help center', style: TextStyle(fontSize: 15),),

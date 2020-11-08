@@ -1,8 +1,10 @@
 import 'package:find_construction/models/login_models.dart';
+import 'package:find_construction/screens/loading_screen.dart';
 import 'package:find_construction/screens/login_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'home_Screen.dart';
@@ -15,17 +17,20 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 Future<LoginModel> createSinUp(String name, String phone, String address,
-    String email, String password) async {
+    String email, String password,String conPassword) async {
   final String apiUrl = "https://construction.bazaaaar.com/signup.php";
   final response = await http.post(apiUrl, body: {
     "name": name,
     "phone": phone,
     "address": address,
     "email": email,
-    "password": password
+    "password": password,
+    "conpassword": conPassword,
+    "source": ""
   });
   if (response.statusCode == 200) {
     final String responseString = response.body;
+    print("----------------respnse ${response.body}------------");
     return loginModelFromJson(responseString);
   } else {
     return null;
@@ -55,6 +60,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       strConformPassword,
       strPassword;
   String empty ="Empty !";
+  save(value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("login_response", json.encode(value));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +118,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     validator: (String value) {
                       if (value.isEmpty)
                         return "Empty !";
-                      else if (emailValidation(value)){
+                      else if (emailValidation(value.trim())){
                         strEmail= value.toString().trim();
                       }
                       else
@@ -189,6 +198,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     // ignore: missing_return
                     validator: (String val) {
                       if (val.isEmpty) return empty;
+                      else strConformPassword = val.toString().trim();
                       if (val != _pass.text) return 'Not Match';
                       return null;
                     },
@@ -207,23 +217,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       splashColor: Colors.blueAccent,
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          LoginModel sinUp = await createSinUp(
-                              strName,
-                              strPhone,
-                              strAddress,
-                              strEmail,
-                              strPassword);
+                          LoginModel sinUp = await createSinUp(strName, strPhone, strAddress, strEmail, strPassword, strConformPassword);
 
                           setState(() {
-                            _loginModel = sinUp;
+                           _loginModel = sinUp;
                           });
-                          print(
-                              "email: $strEmail and Password $strPassword");
+
+
+
+                          print("--------name:$strName, phone $strPhone, address $strAddress, $strEmail, $strPassword, $strConformPassword-------------------");
+                          print("---------------lgon modals : ${_loginModel.status}---------");
 
                           if (_loginModel.status) {
+                            save(_loginModel);
                             Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text(_loginModel.message)));
-                            Navigator.pushReplacementNamed(context, HomeScreen.id);
+                            Navigator.pushReplacementNamed(context, LoadingScreen.id);
                           } else
                             Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text(_loginModel.message)));

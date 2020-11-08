@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    print("---------------response of data ${widget.houseHomeModel.message}----------------");
+    print("---------------response of data ${widget.houseHomeModel.response.length}----------------");
     print("---------------lat: ${widget.lat} and lng : ${widget.lng}----------------");
   }
   @override
