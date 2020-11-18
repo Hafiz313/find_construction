@@ -12,9 +12,10 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="find_construction"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        tools:ignore="MissingClass">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBphavpdVWXrIyizCPp-M074zMi2xq1Pfc"/>
+            android:value="AIzaSyC47Pb1Mr7XP48DQGaIHiQQwYehJ5z898Q"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

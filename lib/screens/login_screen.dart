@@ -1,13 +1,12 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:connectivity/connectivity.dart';
 import 'package:find_construction/models/login_models.dart';
 import 'package:find_construction/screens/forget_screen.dart';
 import 'package:find_construction/screens/home_Screen.dart';
-import 'package:find_construction/screens/profile_screen.dart';
 import 'package:find_construction/screens/registration_screen.dart';
 import 'package:find_construction/utils/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +23,8 @@ class LoginScreen extends StatefulWidget {
 
 Future<LoginModel> createLogin(String email, String password) async {
   final String apiUrl = "https://construction.bazaaaar.com/signin.php";
-  final response = await http.post(apiUrl, body: {"email": email, "password": password});
+  final response =
+      await http.post(apiUrl, body: {"email": email, "password": password});
   if (response.statusCode == 200) {
     final String responseString = response.body;
     return loginModelFromJson(responseString);
@@ -33,35 +33,94 @@ Future<LoginModel> createLogin(String email, String password) async {
   }
 }
 
+emailValidation(String email) {
+  Pattern pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regex = new RegExp(pattern);
+  if (regex.hasMatch(email)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
- emailValidation(String email ){
-  Pattern pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-   RegExp regex = new RegExp(pattern);
-   if (regex.hasMatch(email)) {
-     return true;
-   }
-   else{
-     return false;
-   }
- }
+showAlertDialog(BuildContext context) {
+  AlertDialog alert = AlertDialog(
+    content: new Row(
+      children: [
+        CircularProgressIndicator(),
+        Container(margin: EdgeInsets.only(left: 10), child: Text(" Loading")),
+      ],
+    ),
+  );
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
+Future<LoginModel> createSinUp(String name, String email,) async {
+  final String apiUrl = "https://construction.bazaaaar.com/signup.php";
+  final response = await http.post(apiUrl, body: {
+    "name": name,
+    "phone": "",
+    "address": "",
+    "email": email,
+    "password": "123",
+    "conpassword": "123",
+    "source": "google",
+    "image": "",
+  });
+  if (response.statusCode == 200) {
+    final String responseString = response.body;
+    print("----------------respnse ${response.body}------------");
+    return loginModelFromJson(responseString);
+  } else {
+    return null;
+  }
+}
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _load = false;
   var _formKey = GlobalKey<FormState>();
   LoginModel _loginModel;
   String strEmail, strPassword;
-  GoogleSignIn _googleSignIn=GoogleSignIn(scopes:['email']);
-  //final facebookLogin = FacebookLogin();
+  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+ // final facebookLogin = FacebookLogin();
 
+  /*
+   login() async{
+    var currentState= globalKey.currentState;
+    if(currentState.validate()){
+      currentState.save();
+      FirebaseAuth firebaseAuth=FirebaseAuth.instance;
+      try {
+
+        AuthResult authResult=await firebaseAuth.signInWithEmailAndPassword(
+            email: email, password: password);
+        FirebaseUser user=authResult.user;
+        Navigator.pop(context);
+      }catch(e){
+        print(e);
+      }
+    }else{
+
+    }
+  }
+*/
   @override
   void initState() {
-   // facebookLogin.loginBehavior=FacebookLoginBehavior.webViewOnly;
+   // facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
     super.initState();
   }
 
-  /* static final FacebookLogin facebookSignIn = new FacebookLogin();
-  String _message = 'Log in/out by pressing the buttons below.';
+  /*  static final FacebookLogin facebookSignIn = new FacebookLogin();
+  String _message = 'Log in/out by pressing the buttons below.';*/
 
-  Future<Null> _login() async {
+/*  Future<Null> _login() async {
     final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
@@ -85,7 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
         break;
     }
   }*/
-
   /*Future<Null> _logOut() async {
     await facebookSignIn.logOut();
     _showMessage('Logged out.');
@@ -96,251 +154,291 @@ class _LoginScreenState extends State<LoginScreen> {
       _message = message;
     });
   }*/
+  Future<bool> check() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    }
+    return false;
+  }
+
   save(value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("login_response", json.encode(value));
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Builder(
-        builder: (context) => SingleChildScrollView(
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.only(left: 20, right: 20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 60,
-                    ),
-                    Text(
-                      "Log in",
-                      style: TextStyle(color: kBlueText, fontSize: 30),
-                    ),
-                    SizedBox(
-                      height: 60,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGry)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: new BorderSide(color: kLightGry)),
-                          labelText: 'Email ',
-                          labelStyle: TextStyle(color: kLightGry)),
-                      // ignore: missing_return
-                      validator: (String value) {
-                        if (value.isEmpty)
-                          return "Empty !";
-                        else if (emailValidation(value.trim())){
-                          strEmail= value.toString().trim();
-                        }
-                        else
-                          return "Invalid Email";
-                        }
-
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: kLightGry)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: new BorderSide(color: kLightGry)),
-                          labelText: 'Password ',
-                          labelStyle: TextStyle(color: kLightGry)),
-                      // ignore: missing_return
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return "Empty !";
-                        }
-                        else
-                          strPassword=value.toString().trim();
-                      },
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      child: FlatButton(
-                        color: kBlueText,
-                        textColor: Colors.white,
-                        disabledColor: Colors.grey,
-                        disabledTextColor: Colors.black,
-                        padding: EdgeInsets.all(10.0),
-                        splashColor: kButtonBG,
-                        onPressed: () async {
-
-                          if (_formKey.currentState.validate()) {
-                           LoginModel login = await createLogin(strEmail, strPassword);
-
-                           setState(() {
-                              _loginModel=login;
-                           });
-                           print("email: $strEmail and Password $strPassword");
-                           if(_loginModel.status){
-                             save(_loginModel);
-                             print("---------login ${_loginModel.response[0]}----------");
-                             Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
-                              Navigator.pushNamed(context, LoadingScreen.id);
-                           }
-                           else
-                             Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
-                          }
-                        },
-                        child: Text(
-                          "Sign In",
-                          style: TextStyle(fontSize: 22),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 15),
-                      alignment: Alignment.centerRight,
-                      child: InkWell(
-                        onTap: (){
-                         Navigator.pushNamed(context, ForgetScreen.id);
-                         // Navigator.pushNamed(context, LoadingScreen.id);
-                        },
-                        child: Text(
-                          "Forgot your password?",
-                          style: TextStyle(color: kLightGry, fontSize: 15),
-
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(fontSize: 15, color: kGry),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacementNamed(context, RegistrationScreen.id);
-                          },
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(color: kBlueText, fontSize: 15),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(children: <Widget>[
-                      Expanded(
-                        child: new Container(
-                            margin:
-                                const EdgeInsets.only(left: 10.0, right: 20.0),
-                            child: Divider(
-                              color: kGry,
-                              height: 36,
-                            )),
+      body: Center(
+        child: Builder(
+          builder: (context) => SingleChildScrollView(
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 60,
                       ),
                       Text(
-                        "OR",
-                        style: TextStyle(color: kGry),
+                        "Log in",
+                        style: TextStyle(color: kBlueText, fontSize: 30),
                       ),
-                      Expanded(
-                        child: new Container(
-                            margin:
-                                const EdgeInsets.only(left: 20.0, right: 10.0),
-                            child: Divider(
-                              color: kGry,
-                              height: 36,
-                            )),
+                      SizedBox(
+                        height: 60,
                       ),
-                    ]),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: Text('Sign up with social network'),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 30),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async{
-                                try{
-                                         //    _fbLogin();
-                                  print("facebook login");
-                                }
-                                catch(e){
-                                  print(e);
-                                }
+                      TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: kLightGry)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: new BorderSide(color: kLightGry)),
+                              labelText: 'Email ',
+                              labelStyle: TextStyle(color: kLightGry)),
+                          // ignore: missing_return
+                          validator: (String value) {
+                            if (value.isEmpty)
+                              return "Empty !";
+                            else if (emailValidation(value.trim())) {
+                              strEmail = value.toString().trim();
+                            } else
+                              return "Invalid Email";
+                          }),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: kLightGry)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: new BorderSide(color: kLightGry)),
+                            labelText: 'Password ',
+                            labelStyle: TextStyle(color: kLightGry)),
+                        // ignore: missing_return
+                        validator: (String value) {
+                          if (value.isEmpty) {
+                            return "Empty !";
+                          } else
+                            strPassword = value.toString().trim();
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        child: FlatButton(
+                          color: kBlueText,
+                          textColor: Colors.white,
+                          disabledColor: Colors.grey,
+                          disabledTextColor: Colors.black,
+                          padding: EdgeInsets.all(10.0),
+                          splashColor: kButtonBG,
+                          onPressed: () async {
+                            if (_formKey.currentState.validate()) {
+                              showAlertDialog(context);
 
-
-                              },
-                              child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: Image(
-                                    image: AssetImage('images/fb.png'),
-                                  )),
-                            ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async{
-                                try{
-                                  _googleSignIn.signOut();
-                                  await _googleSignIn.signIn().then((value) {
-                                    final String name=_googleSignIn.currentUser.displayName;
-                                    final String email=_googleSignIn.currentUser.email;
-                                    final String id=_googleSignIn.currentUser.id;
-                                    final String pic=_googleSignIn.currentUser.photoUrl;
-
-                                    print("name $name");
-                                    print("email $email");
-                                    print("id $id");
-                                    print("picture $pic");
+                                var connectivityResult = await (Connectivity().checkConnectivity());
+                                if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+                                  LoginModel login = await createLogin(strEmail, strPassword);
+                                  setState(() {
+                                    _loginModel = login;
                                   });
+                                  print(
+                                      "email: $strEmail and Password $strPassword");
+                                  if (_loginModel.status) {
+                                    save(_loginModel);
+                                    print(
+                                        "---------login ${_loginModel.response}----------");
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text(_loginModel.message)));
+                                    Navigator.pushReplacementNamed(context, HomeScreen.id);
+                                  } else
+                                    Navigator.pop(context);
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                      content: Text(_loginModel.message)));
                                 }
-                                catch(err)
-                                {
-                                  print(err);
+                                else{
+                                  Navigator.pop(context);
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                      content: Text("Mobile is not Connected to Internet")));
                                 }
 
-                              },
-                              child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: Image(
-                                    image: AssetImage('images/gplus.png'),
-                                  )),
+
+
+                            }
+                          },
+                          child: Text(
+                            "Sign In",
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 15),
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, ForgetScreen.id);
+                          },
+                          child: Text(
+                            "Forgot your password?",
+                            style: TextStyle(color: kLightGry, fontSize: 15),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account?",
+                            style: TextStyle(fontSize: 15, color: kGry),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacementNamed(
+                                  context, RegistrationScreen.id);
+                            },
+                            child: Text(
+                              "Sign Up",
+                              style: TextStyle(color: kBlueText, fontSize: 15),
                             ),
                           ),
-
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    )
-                  ],
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(children: <Widget>[
+                        Expanded(
+                          child: new Container(
+                              margin: const EdgeInsets.only(
+                                  left: 10.0, right: 20.0),
+                              child: Divider(
+                                color: kGry,
+                                height: 36,
+                              )),
+                        ),
+                        Text(
+                          "OR",
+                          style: TextStyle(color: kGry),
+                        ),
+                        Expanded(
+                          child: new Container(
+                              margin: const EdgeInsets.only(
+                                  left: 20.0, right: 10.0),
+                              child: Divider(
+                                color: kGry,
+                                height: 36,
+                              )),
+                        ),
+                      ]),
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        child: Text('Sign up with social network'),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 30),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  try {
+                                    //_fbLogin();
+                                    print("facebook login");
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage('images/fb.png'),
+                                    )),
+                              ),
+                            ),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  try {
+                                    _googleSignIn.signOut();
+                                    showAlertDialog(context);
+                                    await _googleSignIn
+                                        .signIn()
+                                        .then((value) async {
+                                      final String name =
+                                          _googleSignIn.currentUser.displayName;
+                                      final String email =
+                                          _googleSignIn.currentUser.email;
+                                      final String id =
+                                          _googleSignIn.currentUser.id;
+                                      final String pic =
+                                          _googleSignIn.currentUser.photoUrl;
+                                      showAlertDialog(context);
+                                      LoginModel login = await createSinUp(name, email);
+                                      setState(() {
+                                        _loginModel = login;
+                                      });
+                                      save(_loginModel);
+                                      if(_loginModel.status){
+                                        Navigator.pushReplacementNamed(context, HomeScreen.id);
+                                        Scaffold.of(context).showSnackBar(SnackBar(content: Text(_loginModel.message)));
+                                      }
+
+
+                                      print(
+                                          "-----------------name ${_loginModel.status}------------------------");
+                                      print(
+                                          "-----------------email $email-----------------------");
+                                      print(
+                                          "------------------id $id---------------------------");
+                                      print(
+                                          "-----------------picture $pic----------------------");
+
+                                    });
+                                  } catch (err) {
+                                    print(
+                                        "----------google login error ${err}----------------------");
+                                    Navigator.pop(context);
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text("Error $err")));
+                                  }
+                                },
+                                child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage('images/gplus.png'),
+                                    )),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -350,11 +448,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /*_fbLogin() async{
-    final result = await facebookLogin.logInWithReadPermissions(['email']);
+  /*_fbLogin() async {
+    final result = await facebookLogin.logIn(['email']);
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
-
         final fbToken = result.accessToken.token;
         final graphResponse = await http.get(
             'https://graph.facebook.com/v2.12/me?fields=name,picture.width(800).height(800),email&access_token=$fbToken');
@@ -362,29 +459,19 @@ class _LoginScreenState extends State<LoginScreen> {
         final profile = JSON.jsonDecode(graphResponse.body);
         print(profile.toString());
 
-
-        final String name=profile['name'];
-        final String gid=profile['id'];
-        final String pic=profile["picture"]["data"]["url"];
-        final String email=profile["email"];
-
-
-
-        final String password="";
-
-
-
-
+        final String name = profile['name'];
+        final String gid = profile['id'];
+        final String pic = profile["picture"]["data"]["url"];
+        final String email = profile["email"];
+        final String password = "";
         break;
       case FacebookLoginStatus.cancelledByUser:
-        Fluttertoast.showToast(msg:"Facebook login cancelled by User");
+        Fluttertoast.showToast(msg: "Facebook login cancelled by User");
 
         break;
       case FacebookLoginStatus.error:
-        Fluttertoast.showToast(msg:result.errorMessage);
+        Fluttertoast.showToast(msg: result.errorMessage);
         break;
     }
-
   }*/
-  }
-
+}

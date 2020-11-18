@@ -26,7 +26,8 @@ Future<LoginModel> createSinUp(String name, String phone, String address,
     "email": email,
     "password": password,
     "conpassword": conPassword,
-    "source": ""
+    "source": "",
+    "image": "",
   });
   if (response.statusCode == 200) {
     final String responseString = response.body;
@@ -46,6 +47,21 @@ emailValidation(String email) {
   } else {
     return false;
   }
+}
+showAlertDialog(BuildContext context){
+  AlertDialog alert=AlertDialog(
+    content: new Row(
+      children: [
+        CircularProgressIndicator(),
+        Container(margin: EdgeInsets.only(left: 10),child:Text(" Loading" )),
+      ],),
+  );
+  showDialog(barrierDismissible: false,
+    context:context,
+    builder:(BuildContext context){
+      return alert;
+    },
+  );
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
@@ -69,210 +85,224 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Builder(
-        builder: (context) => SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.only(left: 20, right: 20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Text(
-                    "Registration",
-                    style: TextStyle(color: kBlueText, fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Name ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return empty;
-                      } else
-                        strName = value.toString().trim();
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Email ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String value) {
-                      if (value.isEmpty)
-                        return "Empty !";
-                      else if (emailValidation(value.trim())){
-                        strEmail= value.toString().trim();
-                      }
-                      else
-                        return "Invalid Email";
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Address ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return empty;
-                      } else
-                        strAddress = value.toString().trim();
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Telephone ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return empty;
-                      } else
-                        strPhone = value.toString().trim();
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: _pass,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Password ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return empty;
-                      } else
-                        strPassword = value.toString().trim();
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: _confirmPass,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: kLightGry)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: new BorderSide(color: kLightGry)),
-                        labelText: 'Confrim Password ',
-                        labelStyle: TextStyle(color: kLightGry)),
-                    // ignore: missing_return
-                    validator: (String val) {
-                      if (val.isEmpty) return empty;
-                      else strConformPassword = val.toString().trim();
-                      if (val != _pass.text) return 'Not Match';
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: FlatButton(
-                      color: kBlueText,
-                      textColor: Colors.white,
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.black,
-                      padding: EdgeInsets.all(10.0),
-                      splashColor: Colors.blueAccent,
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          LoginModel sinUp = await createSinUp(strName, strPhone, strAddress, strEmail, strPassword, strConformPassword);
-
-                          setState(() {
-                           _loginModel = sinUp;
-                          });
-
-
-
-                          print("--------name:$strName, phone $strPhone, address $strAddress, $strEmail, $strPassword, $strConformPassword-------------------");
-                          print("---------------lgon modals : ${_loginModel.status}---------");
-
-                          if (_loginModel.status) {
-                            save(_loginModel);
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text(_loginModel.message)));
-                            Navigator.pushReplacementNamed(context, LoadingScreen.id);
-                          } else
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text(_loginModel.message)));
-                        }
-                      },
-                      child: Text(
-                        "Sign in",
-                        style: TextStyle(fontSize: 22),
-                      ),
+      body: Center(
+        child: Builder(
+          builder: (context) => SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 40,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account?",
-                        style: TextStyle(fontSize: 15, color: kGry),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, LoginScreen.id);
+                    Text(
+                      "Registration",
+                      style: TextStyle(color: kBlueText, fontSize: 30),
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.name,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Name ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return empty;
+                        } else
+                          strName = value.toString().trim();
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Email ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String value) {
+                        if (value.isEmpty)
+                          return "Empty !";
+                        else if (emailValidation(value.trim())){
+                          strEmail= value.toString().trim();
+                        }
+                        else
+                          return "Invalid Email";
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.streetAddress,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Address ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return empty;
+                        } else
+                          strAddress = value.toString().trim();
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Telephone ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return empty;
+                        } else
+                          strPhone = value.toString().trim();
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      obscureText: true,
+                      controller: _pass,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Password ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return empty;
+                        } else
+                          strPassword = value.toString().trim();
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      obscureText: true,
+                      controller: _confirmPass,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: kLightGry)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: new BorderSide(color: kLightGry)),
+                          labelText: 'Confrim Password ',
+                          labelStyle: TextStyle(color: kLightGry)),
+                      // ignore: missing_return
+                      validator: (String val) {
+                        if (val.isEmpty) return empty;
+                        else strConformPassword = val.toString().trim();
+                        if (val != _pass.text) return 'Not Match';
+                        return null;
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      child: FlatButton(
+                        color: kBlueText,
+                        textColor: Colors.white,
+                        disabledColor: Colors.grey,
+                        disabledTextColor: Colors.black,
+                        padding: EdgeInsets.all(10.0),
+                        splashColor: Colors.blueAccent,
+                        onPressed: () async {
+                          if (_formKey.currentState.validate()) {
+                            showAlertDialog(context);
+                            LoginModel sinUp = await createSinUp(strName, strPhone, strAddress, strEmail, strPassword, strConformPassword);
+
+                            setState(() {
+                             _loginModel = sinUp;
+                            });
+
+
+
+                            print("--------name:$strName, phone $strPhone, address $strAddress, $strEmail, $strPassword, $strConformPassword-------------------");
+                            print("---------------lgon modals : ${_loginModel.status}---------");
+
+                            if (_loginModel.status) {
+                              save(_loginModel);
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(_loginModel.message)));
+                              Navigator.pushReplacementNamed(context, HomeScreen.id);
+                            } else
+                              Navigator.pop(context);
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(_loginModel.message)));
+                          }
                         },
                         child: Text(
-                          "Sign up",
-                          style:
-                              TextStyle(color: kBlueText, fontSize: 15),
+                          "Sign in",
+                          style: TextStyle(fontSize: 22),
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(fontSize: 15, color: kGry),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, LoginScreen.id);
+                          },
+                          child: Text(
+                            "Sign in",
+                            style:
+                                TextStyle(color: kBlueText, fontSize: 15),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

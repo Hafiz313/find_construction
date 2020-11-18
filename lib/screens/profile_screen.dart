@@ -5,6 +5,7 @@ import 'package:find_construction/utils/app_color.dart';
 import 'package:find_construction/weight/home_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const id = "profile_screen";
@@ -12,6 +13,7 @@ class ProfileScreen extends StatefulWidget {
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
+
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String strName="", strMail="", strAddress="", strPhoneNo="";
@@ -26,16 +28,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       strName =
-          json.decode(prefs.getString("login_response"))["response"][0]["name"]?? "";
-      strMail = json.decode(prefs.getString("login_response"))["response"][0]
+          json.decode(prefs.getString("login_response"))["response"]["name"]?? "";
+      strMail = json.decode(prefs.getString("login_response"))["response"]
           ["email"] ?? "";
-      strAddress = json.decode(prefs.getString("login_response"))["response"][0]
+      strAddress = json.decode(prefs.getString("login_response"))["response"]
           ["address"] ?? "";
-      strPhoneNo = json.decode(prefs.getString("login_response"))["response"][0]
+      strPhoneNo = json.decode(prefs.getString("login_response"))["response"]
           ["phone"] ?? "";
     });
     print(
-        "-----------------------login data in profile ${json.decode(prefs.getString("login_response"))["response"][0]["name"]}-------------------");
+        "-----------------------login data in profile ${json.decode(prefs.getString("login_response"))["response"]["name"]}-------------------");
     print("-----------$strName m $strMail, add $strAddress and $strPhoneNo");
     return json.decode(prefs.getString("login_response"));
   }
@@ -54,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Container(
                 width: double.infinity,
-                height: 200.0,
+                height: 100.0,
                 color: kBlueText,
                 child: Align(
                   alignment: const Alignment(0, 1.0),

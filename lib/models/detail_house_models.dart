@@ -1,93 +1,105 @@
 // To parse this JSON data, do
 //
-//     final houseHomeModel = houseHomeModelFromJson(jsonString);
+//     final detailHouseModel = detailHouseModelFromJson(jsonString);
 
 import 'dart:convert';
 
-HouseHomeModel houseHomeModelFromJson(String str) => HouseHomeModel.fromJson(json.decode(str));
+DetailHouseModel detailHouseModelFromJson(String str) => DetailHouseModel.fromJson(json.decode(str));
 
-String houseHomeModelToJson(HouseHomeModel data) => json.encode(data.toJson());
+String detailHouseModelToJson(DetailHouseModel data) => json.encode(data.toJson());
 
-class HouseHomeModel {
-  HouseHomeModel({
+class DetailHouseModel {
+  DetailHouseModel({
     this.message,
     this.response,
     this.status,
   });
 
   String message;
-  List<Response> response;
+  Response response;
   bool status;
 
-  factory HouseHomeModel.fromJson(Map<String, dynamic> json) => HouseHomeModel(
+  factory DetailHouseModel.fromJson(Map<String, dynamic> json) => DetailHouseModel(
     message: json["message"],
-    response: List<Response>.from(json["response"].map((x) => Response.fromJson(x))),
+    response: Response.fromJson(json["response"]),
     status: json["status"],
   );
 
   Map<String, dynamic> toJson() => {
     "message": message,
-    "response": List<dynamic>.from(response.map((x) => x.toJson())),
+    "response": response.toJson(),
     "status": status,
   };
 }
 
 class Response {
   Response({
+    this.id,
     this.name,
-    this.icon,
     this.mainIcon,
+    this.icon,
+    this.phone,
+    this.email,
     this.bedroom,
     this.washroom,
     this.kitchen,
+    this.area,
     this.location,
     this.shortDetail,
-    this.area,
     this.latitude,
     this.longtitude,
     this.video,
   });
 
+  String id;
   String name;
-  String icon;
   String mainIcon;
+  List<String> icon;
+  String phone;
+  String email;
   String bedroom;
   String washroom;
   String kitchen;
+  String area;
   String location;
   String shortDetail;
-  String area;
   String latitude;
   String longtitude;
-  String video;
+  List<String> video;
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
+    id: json["id"],
     name: json["name"],
-    icon: json["icon"],
     mainIcon: json["main_icon"],
+    icon: List<String>.from(json["icon"].map((x) => x)),
+    phone: json["phone"],
+    email: json["email"],
     bedroom: json["bedroom"],
     washroom: json["washroom"],
     kitchen: json["kitchen"],
+    area: json["area"],
     location: json["location"],
     shortDetail: json["short_detail"],
-    area: json["area"],
     latitude: json["latitude"],
     longtitude: json["longtitude"],
-    video: json["video"],
+    video: List<String>.from(json["video"].map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
+    "id": id,
     "name": name,
-    "icon": icon,
     "main_icon": mainIcon,
+    "icon": List<dynamic>.from(icon.map((x) => x)),
+    "phone": phone,
+    "email": email,
     "bedroom": bedroom,
     "washroom": washroom,
     "kitchen": kitchen,
+    "area": area,
     "location": location,
     "short_detail": shortDetail,
-    "area": area,
     "latitude": latitude,
     "longtitude": longtitude,
-    "video": video,
+    "video": List<dynamic>.from(video.map((x) => x)),
   };
 }

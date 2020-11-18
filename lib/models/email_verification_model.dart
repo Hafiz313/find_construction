@@ -1,15 +1,15 @@
 // To parse this JSON data, do
 //
-//     final loginModel = loginModelFromJson(jsonString);
+//     final emailVerificationModel = emailVerificationModelFromJson(jsonString);
 
 import 'dart:convert';
 
-LoginModel loginModelFromJson(String str) => LoginModel.fromJson(json.decode(str));
+EmailVerificationModel emailVerificationModelFromJson(String str) => EmailVerificationModel.fromJson(json.decode(str));
 
-String loginModelToJson(LoginModel data) => json.encode(data.toJson());
+String emailVerificationModelToJson(EmailVerificationModel data) => json.encode(data.toJson());
 
-class LoginModel {
-  LoginModel({
+class EmailVerificationModel {
+  EmailVerificationModel({
     this.message,
     this.response,
     this.status,
@@ -19,7 +19,7 @@ class LoginModel {
   Response response;
   bool status;
 
-  factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
+  factory EmailVerificationModel.fromJson(Map<String, dynamic> json) => EmailVerificationModel(
     message: json["message"],
     response: Response.fromJson(json["response"]),
     status: json["status"],
@@ -35,35 +35,19 @@ class LoginModel {
 class Response {
   Response({
     this.id,
-    this.name,
     this.email,
-    this.phone,
-    this.address,
-    this.img,
   });
 
   String id;
-  String name;
   String email;
-  String phone;
-  String address;
-  String img;
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
     id: json["id"],
-    name: json["name"],
     email: json["email"],
-    phone: json["phone"],
-    address: json["address"],
-    img: json["img"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "name": name,
     "email": email,
-    "phone": phone,
-    "address": address,
-    "img": img,
   };
 }
